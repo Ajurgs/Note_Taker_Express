@@ -13,20 +13,32 @@ app.get("/notes", (req, res) => {
 });
 
 app.get("/api/notes", (req, res) => {
-  res.json(path.join(__dirname + "/db", "db.json"));
+  res.sendFile(path.join(__dirname + "/db", "db.json"));
 });
 
-app.post("/api/notes", (res, req) => {
+app.post("/api/notes", (req, res) => {
   const dbJson = require("./db/db.json");
   const note = req.body;
+  note.id = dbJson.length > 0 ? dbJson[dbJson.length - 1].id + 1 : 1;
   dbJson.push(note);
+  console.log(dbJson);
   fs.writeFile("./db/db.json", JSON.stringify(dbJson), function (err) {
     if (err) throw err;
     console.log("saved notes!");
-    res.json(newNote);
+    res.json(note);
   });
 });
 
+app.delete("/api/notes/:id", (req, res) => {
+  const dbJson = require("./db/db.json");
+  const toDeleteId = req.params.id;
+  const newJson = dbJson.filter((note) => note.id != toDeleteId);
+  fs.writeFile("./db/db.json", JSON.stringify(newJson), function (err) {
+    if (err) throw err;
+    console.log("removed the note!");
+    res.status(200).redirect("/note");
+  });
+});
 app.get("*", (req, res) => {
   const url = req.url === "/" ? "index.html" : req.url;
   res.sendFile(path.join(__dirname + "/public", url));
