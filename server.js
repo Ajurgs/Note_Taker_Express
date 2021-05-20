@@ -17,8 +17,16 @@ app.get("/api/notes", (req, res) => {
 });
 
 app.post("/api/notes", (res, req) => {
-  console.log(req.body);
+  const dbJson = require("./db/db.json");
+  const note = req.body;
+  dbJson.push(note);
+  fs.writeFile("./db/db.json", JSON.stringify(dbJson), function (err) {
+    if (err) throw err;
+    console.log("saved notes!");
+    res.json(newNote);
+  });
 });
+
 app.get("*", (req, res) => {
   const url = req.url === "/" ? "index.html" : req.url;
   res.sendFile(path.join(__dirname + "/public", url));
