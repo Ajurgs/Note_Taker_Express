@@ -1,5 +1,6 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -11,16 +12,17 @@ app.get("/notes", (req, res) => {
   res.sendFile(path.join(__dirname + "/public", "notes.html"));
 });
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname + "/public", "index.html"));
-});
-
 app.get("/api/notes", (req, res) => {
   res.json(path.join(__dirname + "/db", "db.json"));
 });
 
-app.post("/api/notes", (res, req) => {});
-
+app.post("/api/notes", (res, req) => {
+  console.log(req.body);
+});
+app.get("*", (req, res) => {
+  const url = req.url === "/" ? "index.html" : req.url;
+  res.sendFile(path.join(__dirname + "/public", url));
+});
 app.listen(PORT, () => {
   console.log(`App listening on PORT ${PORT}`);
 });
